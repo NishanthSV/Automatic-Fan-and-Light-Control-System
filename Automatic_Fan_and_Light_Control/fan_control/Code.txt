@@ -1,0 +1,101 @@
+int led1 = 13;
+int led2 = 12;
+int sensorPin1 = 2;
+int sensorPin2 = 3;
+int sensor1 = 0;
+int sensor2 = 0;
+int motor1 = 6;
+int motor2 = 7;
+int temperoryPin = 0;
+int tempVal = 0;
+int temperature = 0;
+int temperaturePin = A0;
+int speedFan = 0;
+float temp;
+
+void setup() {
+pinMode(sensorPin1, INPUT);     // Detecting the motion of person in Region 1
+pinMode(sensorPin2, INPUT);     // Detecting the motion of person in Region 1
+pinMode(led1, OUTPUT);          // Displaying the motion of person in Region 1
+pinMode(led2, OUTPUT);          // Displaying the motion of person in Region 2
+pinMode(temperoryPin, INPUT);   // If a person does not want fan, he can temperorily switch off the fan by enabling the pin (eventhough there is a motion)
+pinMode(motor1, OUTPUT);        //  Enables Fan1
+pinMode(motor2, OUTPUT);        // Enables Fan2
+Serial.begin(9600);
+}
+void loop() {
+
+  sensor1 = digitalRead(sensorPin1);    // sensor1 value
+  sensor2 = digitalRead(sensorPin2);    // sensor2 value
+tempVal = digitalRead(temperoryPin);  // temperory pin value
+Serial.print("TemperoryPin : ");
+Serial.println(tempVal);
+Serial.print("Sensor 1 :");
+Serial.println(sensor1);
+Serial.print("Sensor 2 :");
+Serial.println(sensor2);
+
+  temperature = analogRead(temperaturePin);   // reading the room temperature
+  temperature = temperature * 0.48828125;     // converting temperature from pin value to Celcius
+Serial.print("Temperature : ");
+Serial.println(temperature);
+  // Assigning the speed of fan based on room temperature
+  if (temperature >= 15  && temperature < 26) {
+speedFan = 100;
+  } else if (temperature > 26 && temperature <= 28) {
+speedFan = 150;
+  } else if (temperature > 28 && temperature <= 32) {
+  }
+
+  if (sensor1 == 1) {
+    if (tempVal == 1) {
+Serial.print("SpeedFan1 : ");
+Serial.println(speedFan);
+      for (int i = 0; i< 5; i++) {
+motor(motor1, speedFan);
+digitalWrite(led1, HIGH);
+      }
+delay(1000);
+      // If a person is there and he wants fan in Region 1
+    }
+  }
+  if (sensor2 == 1) {
+    if (tempVal == 1) {
+      for (int i = 0; i< 5; i++) {
+Serial.print("SpeedFan2 : ");
+Serial.println(speedFan);
+motortype(motor2, 250);
+digitalWrite(led2, HIGH);
+      }
+delay(1000);
+      // If a person is there and he wants fan in Region 2
+    }
+  }
+
+  else if (sensor1 == 0) {
+motor(motor1, 0);
+digitalWrite(led1, LOW);
+    // If there is no motion in Region 1
+delay(1000);
+  }
+  else if (sensor2 == 0) {
+motor(motor2, 0);
+digitalWrite(led2, LOW);
+    // If there is no motion in Region 2
+delay(1000);
+  }
+
+delay(1000);
+Serial.println();
+Serial.println();
+
+}
+void motor(int type, int speedFan) {
+
+analogWrite(type, speedFan);
+delay(1000);
+
+}
+void motortype(int type, int speedFan) {
+analogWrite(type, speedFan);
+delay(1000);
